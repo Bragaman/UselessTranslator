@@ -39,7 +39,7 @@ Useless translator for useless language. This is course project. Language use fo
     * logical nor: `.#(logic exp)` !?
   * Assigment `<-`
   * Comparison `<exp> eq <const>`. Three types: logic, int, proc
-  * Cycles `(<logic exp>)<cycle operator>{statements}' ?!   
+  * Cycles `(<logic exp>)<cycle operator>{statements}` ?!
     Note: I dont know what should I use how a cycle operator 
   * Conditions `[<logic exp>] please ~N`  ?! need to know, can I do so?   
     if logic exp is true go to label
