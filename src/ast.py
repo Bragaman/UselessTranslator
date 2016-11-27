@@ -6,9 +6,11 @@ class Node:
 class Statements(Node):
     def __init__(self, stmts):
         self.stmts = stmts
+        self.labels = {}
 
     def exec(self):
         for stmt in self.stmts:
+
             stmt.exec()
 
 
@@ -18,6 +20,14 @@ class Statement(Node):
 
     def exec(self):
         self.stmt.exec()
+
+
+class GoTo(Node):
+    def __init__(self, label):
+        self.label = label
+
+    def exec(self):
+        return self.label, 'go_to'
 
 
 class Var(Node):

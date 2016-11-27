@@ -8,12 +8,10 @@ if __name__ == "__main__":
     lexer = lex.lex(module=tokenrules)
     parser = yacc.yacc(module=parserrules)
 
-    code = ''',1 <- 10
-    ,3 <- ,1
-    ,3
-    ,#1
-    ,2 <- ,1
-    ,2
+    code = '''~2
+    ,1 <- 10
+    ,*1
+    please ~2
     '''
 
     ast = parser.parse(code)

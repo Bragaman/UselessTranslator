@@ -3,6 +3,8 @@ from ast import *
 
 type_int = 'integer'
 type_bool = 'bool'
+type_label = 'label'
+
 
 global_var = {}
 
@@ -30,8 +32,17 @@ def p_statements_list(p):
 def p_statement(p):
     '''statement : int_exp
                  | var_def
+                 | go_to
                  | '''
     p[0] = Statement(p[1])
+
+
+def p_go_to(p):
+    '''go_to : GO_TO var LE'''
+    if p[2].value_type == type_label:
+        p[0] = GoTo(p[2])
+    else:
+        print('type error')
 
 
 def p_var_def(p):
@@ -50,12 +61,16 @@ def p_var_def(p):
 
 
 def p_var(p):
-    '''var : TYPE INT'''
+    '''var : TYPE INT
+           | LABEL INT'''
 
     if p[1] == ',':
         p[0] = get_from_global(p[2], type_int)
     if p[1] == '.':
         p[0] = get_from_global(p[2], type_bool)
+    if p[1] == '~':
+        p[0] = get_from_global(p[2], type_label)
+
 
 
 def p_literal(p):
@@ -79,7 +94,6 @@ def p_int_op(p):
         if p[2] == '*':
             op_str = '--'
         p[0] = IntExpr(var, op_str)
-
 
 
 def p_error(p):
