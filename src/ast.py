@@ -30,6 +30,28 @@ class Var(Node):
         print(self.value_type + " " + self.id + " : " + str(self.value))
 
 
+class VarAssign(Node):
+    def __init__(self, varL, varR):
+        self.varL = varL
+        self.varR = varR
+
+    def exec(self):
+        self.varL.value = self.varR.value
+
+
+class IntExpr(Node):
+    def __init__(self, var, operator):
+        self.var = var
+        self.operator = operator
+
+    def exec(self):
+        if self.operator == '--':
+            self.var.value = int(self.var.value) - 1
+        if self.operator == '++':
+            self.var.value = int(self.var.value) + 1
+        self.var.exec()
+
+
 class Literal(Node):
     def __init__(self, value, value_type):
         self.value = value
@@ -38,3 +60,4 @@ class Literal(Node):
     def exec(self):
         print(self.value)
         return self.value
+

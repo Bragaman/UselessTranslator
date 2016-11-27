@@ -1,16 +1,14 @@
 tokens = [
     'INT', 'LE', 'ASSIGN',
-    'TYPE', 'BOOL'
+    'TYPE', 'BOOL', 'LABEL',
+    'OP'
 ]
 
 reserved = {
-    '~': 'LABEL',
     ':': 'ARRAY',
     '-': 'ARRAY_OPTIONAL',
     'np': 'PASS',
     'eq': 'EQUAL',
-    '#': 'OP',
-    '*': 'OP',
     'mf': 'MOVEROB',
     'mb': 'MOVEROB',
     'ml': 'MOVEROB',
@@ -24,14 +22,18 @@ t_INT = r'\d+'
 t_ASSIGN = r'<-'
 t_TYPE = r'[\,\.\$]'
 t_BOOL = r'T|F'
+t_LABEL = r'\~'
+t_OP = r'\#|\*'
 # Ignored characters
 t_ignore = " \t"
+
 
 def t_newline(t):
     r'\n'
     t.lexer.lineno += t.value.count("\n")
     t.type = "LE"
     return t
+
 
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])

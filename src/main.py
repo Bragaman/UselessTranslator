@@ -9,14 +9,13 @@ if __name__ == "__main__":
     parser = yacc.yacc(module=parserrules)
 
     code = ''',1 <- 10
-    .2 <- T
+    ,3 <- ,1
+    ,3
+    ,#1
+    ,2 <- ,1
+    ,2
     '''
-    # lexer.input(code)
 
-    # while True:
-    #     tok = lexer.token()  # читаем следующий токен
-    #     if not tok:
-    #         break  # закончились печеньки
-    #     print(tok)
-    #
-    parser.parse(code).exec()
+    ast = parser.parse(code)
+    print('finish build ast:')
+    ast.exec()
