@@ -1,18 +1,10 @@
-import ply.lex as lex
-
-
 tokens = [
-    'INT'
+    'INT', 'LE', 'ASSIGN',
+    'TYPE', 'BOOL'
 ]
 
 reserved = {
-    'T': 'BOOLVAL',
-    'F': 'BOOLVAL',
-    ',': 'TYPE',
-    '.': 'TYPE',
-    '$': 'TYPE',
     '~': 'LABEL',
-    '<-': 'ASSIGN',
     ':': 'ARRAY',
     '-': 'ARRAY_OPTIONAL',
     'np': 'PASS',
@@ -26,7 +18,21 @@ reserved = {
     'tp': 'MOVEROB',
 }
 
-tokens += list(reserved)
+tokens += list(set(reserved.values()))
 
 t_INT = r'\d+'
+t_ASSIGN = r'<-'
+t_TYPE = r'[\,\.\$]'
+t_BOOL = r'T|F'
+# Ignored characters
+t_ignore = " \t"
 
+def t_newline(t):
+    r'\n'
+    t.lexer.lineno += t.value.count("\n")
+    t.type = "LE"
+    return t
+
+def t_error(t):
+    print("Illegal character '%s'" % t.value[0])
+    t.lexer.skip(1)
