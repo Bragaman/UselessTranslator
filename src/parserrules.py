@@ -101,5 +101,6 @@ def p_empty(p):
              | empty LE'''
     p[0] = Empty()
 
+
 def p_error(p):
     print('Unexpected token:', p)

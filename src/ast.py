@@ -16,7 +16,7 @@ class Statements(Node):
             if isinstance(stmt.stmt, Empty):
                 pass
             elif isinstance(stmt.stmt, Label):
-                cur_label = stmt.stmt
+                cur_label = stmt.stmt.value
                 self.labels.append(cur_label)
                 self.blocks[cur_label] = []
             elif not cur_label:
@@ -24,16 +24,22 @@ class Statements(Node):
             else:
                 self.blocks[cur_label].append(stmt)
 
+    def exec_statements(self, stmts, label):
+        for stmt in stmts:
+            res = stmt.exec()
+            if isinstance(res, Label):
+                print('GO TO -> label', res.value)
+                return self.labels.index(res.value)
+        return label + 1
+
     def exec(self):
         print('--Exec before labels--')
-        for stmt in self.stmts:
-            stmt.exec()
-
-        for label in self.labels:
-            print('--Exec label--', label.value)
+        label = self.exec_statements(self.stmts, -1)
+        for i in range(label, len(self.labels)):
+            label = self.labels[i]
+            print('--Exec label--', label)
             stmts = self.blocks[label]
-            for stmt in stmts:
-                stmt.exec()
+            self.exec_statements(stmts, i)
 
 
 class Statement(Node):
@@ -41,7 +47,7 @@ class Statement(Node):
         self.stmt = stmt
 
     def exec(self):
-        self.stmt.exec()
+        return self.stmt.exec()
 
 
 class GoTo(Node):
@@ -49,7 +55,7 @@ class GoTo(Node):
         self.label = label
 
     def exec(self):
-        return self.label, 'go_to'
+        return self.label
 
 
 class Label(Node):
