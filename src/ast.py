@@ -5,13 +5,35 @@ class Node:
 
 class Statements(Node):
     def __init__(self, stmts):
-        self.stmts = stmts
-        self.labels = {}
+        self.stmts = []
+        self.blocks = {}
+        self.labels = []
+        self.build_tree(stmts)
+
+    def build_tree(self, stmts):
+        cur_label = None
+        for stmt in stmts:
+            if isinstance(stmt.stmt, Empty):
+                pass
+            elif isinstance(stmt.stmt, Label):
+                cur_label = stmt.stmt
+                self.labels.append(cur_label)
+                self.blocks[cur_label] = []
+            elif not cur_label:
+                self.stmts.append(stmt)
+            else:
+                self.blocks[cur_label].append(stmt)
 
     def exec(self):
+        print('--Exec before labels--')
         for stmt in self.stmts:
-
             stmt.exec()
+
+        for label in self.labels:
+            print('--Exec label--', label.value)
+            stmts = self.blocks[label]
+            for stmt in stmts:
+                stmt.exec()
 
 
 class Statement(Node):
@@ -28,6 +50,14 @@ class GoTo(Node):
 
     def exec(self):
         return self.label, 'go_to'
+
+
+class Label(Node):
+    def __init__(self, value):
+        self.value = value
+
+    def exec(self):
+        return self.value
 
 
 class Var(Node):
@@ -47,6 +77,7 @@ class VarAssign(Node):
 
     def exec(self):
         self.varL.value = self.varR.value
+        print(self.varL.value_type + " " + self.varL.id + " : " + str(self.varL.value))
 
 
 class IntExpr(Node):
@@ -71,3 +102,7 @@ class Literal(Node):
         print(self.value)
         return self.value
 
+
+class Empty(Node):
+    def exec(self):
+        pass

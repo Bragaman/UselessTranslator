@@ -30,25 +30,24 @@ def p_statements_list(p):
 
 
 def p_statement(p):
-    '''statement : int_exp
-                 | var_def
-                 | go_to
-                 | '''
+    '''statement : int_exp LE
+                 | var_def LE
+                 | go_to LE
+                 | label LE
+                 | empty
+                 '''
     p[0] = Statement(p[1])
 
 
 def p_go_to(p):
-    '''go_to : GO_TO var LE'''
-    if p[2].value_type == type_label:
-        p[0] = GoTo(p[2])
-    else:
-        print('type error')
+    '''go_to : GO_TO label'''
+    p[0] = GoTo(p[2])
 
 
 def p_var_def(p):
-    '''var_def : var LE
-               | var ASSIGN literal LE
-               | var ASSIGN var LE'''
+    '''var_def : var
+               | var ASSIGN literal
+               | var ASSIGN var'''
 
     if len(p) == 3:
         p[0] = p[1]
@@ -61,16 +60,17 @@ def p_var_def(p):
 
 
 def p_var(p):
-    '''var : TYPE INT
-           | LABEL INT'''
+    '''var : TYPE INT'''
 
     if p[1] == ',':
         p[0] = get_from_global(p[2], type_int)
     if p[1] == '.':
         p[0] = get_from_global(p[2], type_bool)
-    if p[1] == '~':
-        p[0] = get_from_global(p[2], type_label)
 
+
+def p_label(p):
+    '''label : LABEL INT'''
+    p[0] = Label(p[2])
 
 
 def p_literal(p):
@@ -84,7 +84,7 @@ def p_literal(p):
 
 
 def p_int_op(p):
-    '''int_exp : TYPE OP INT LE'''
+    '''int_exp : TYPE OP INT'''
 
     if p[1] == ',':
         var = get_from_global(p[3], type_int)
@@ -95,6 +95,11 @@ def p_int_op(p):
             op_str = '--'
         p[0] = IntExpr(var, op_str)
 
+
+def p_empty(p):
+    '''empty : LE
+             | empty LE'''
+    p[0] = Empty()
 
 def p_error(p):
     print('Unexpected token:', p)
