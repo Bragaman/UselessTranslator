@@ -1,3 +1,19 @@
+type_int = 'integer'
+type_bool = 'bool'
+type_label = 'label'
+
+
+def converter(type, value):
+    if type == type_int:
+        return int(value)
+    if type == type_bool:
+        if value == 'T':
+            return True
+        else:
+            return False
+    # TODO add functions
+
+
 class Node:
     def exec(self):
         raise NotImplementedError
@@ -74,6 +90,8 @@ class Var(Node):
 
     def exec(self):
         print(self.value_type + " " + self.id + " : " + str(self.value))
+        # return converter(self.value_type, self.value)
+        return self.value
 
 
 class VarAssign(Node):
@@ -82,21 +100,41 @@ class VarAssign(Node):
         self.varR = varR
 
     def exec(self):
-        self.varL.value = self.varR.value
+        self.varL.value = self.varR.exec()
         print(self.varL.value_type + " " + self.varL.id + " : " + str(self.varL.value))
+        return self.varL
 
 
-class IntExpr(Node):
-    def __init__(self, var, operator):
+class Expr(Node):
+    def __init__(self, var, type, operator):
         self.var = var
         self.operator = operator
+        self.type = type
 
     def exec(self):
         if self.operator == '--':
-            self.var.value = int(self.var.value) - 1
+            print('---exec op decrement---')
+            self.var.value = int(self.var.exec()) - 1
         if self.operator == '++':
-            self.var.value = int(self.var.value) + 1
-        self.var.exec()
+            print('---exec op increment---')
+            self.var.value = int(self.var.exec()) + 1
+        return self.var.exec()
+
+
+class Condition(Node):
+    def __init__(self, value, literal):
+        self.value = value
+        self.literal = literal
+        self.value_type = type_bool
+
+    def exec(self):
+        print('---exec condition ---')
+        v = self.value.exec()
+        l = self.literal.exec()
+        if v == l:
+            return 'T'
+        else:
+            return 'F'
 
 
 class Literal(Node):
@@ -105,7 +143,7 @@ class Literal(Node):
         self.value_type = value_type
 
     def exec(self):
-        print(self.value)
+        # return converter(self.value_type, self.value)
         return self.value
 
 

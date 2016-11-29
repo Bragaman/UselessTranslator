@@ -1,11 +1,6 @@
 from tokenrules import tokens
 from ast import *
 
-type_int = 'integer'
-type_bool = 'bool'
-type_label = 'label'
-
-
 global_var = {}
 
 
@@ -30,7 +25,7 @@ def p_statements_list(p):
 
 
 def p_statement(p):
-    '''statement : int_exp LE
+    '''statement : exp LE
                  | var_def LE
                  | go_to LE
                  | label LE
@@ -47,7 +42,9 @@ def p_go_to(p):
 def p_var_def(p):
     '''var_def : var
                | var ASSIGN literal
-               | var ASSIGN var'''
+               | var ASSIGN var
+               | var ASSIGN condition
+               '''
 
     if len(p) == 3:
         p[0] = p[1]
@@ -84,16 +81,24 @@ def p_literal(p):
 
 
 def p_int_op(p):
-    '''int_exp : TYPE OP INT'''
+    '''exp : TYPE OP INT'''
 
     if p[1] == ',':
         var = get_from_global(p[3], type_int)
-        op_str  = ''
+        op_str = ''
         if p[2] == '#':
             op_str = '++'
         if p[2] == '*':
             op_str = '--'
-        p[0] = IntExpr(var, op_str)
+        p[0] = Expr(var, type_int, op_str)
+
+
+def p_conditions(p):
+    '''condition : var EQ literal
+                 | exp EQ literal
+                 | var_def EQ literal
+                 | condition EQ literal'''
+    p[0] = Condition(p[1], p[3])
 
 
 def p_empty(p):
