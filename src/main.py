@@ -10,11 +10,12 @@ if __name__ == "__main__":
 
     code = '''
     ,1 <- 10
-    please ~2
-    ,*1
     ~2
-    ,*1
-    .3 <- ,1 eq 9
+        ,*1
+        ,1 eq 7 please ~3
+        please ~2
+    ~3
+        ,1
     '''
 
     ast = parser.parse(code)

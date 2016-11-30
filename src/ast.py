@@ -56,12 +56,12 @@ class Statements(Node):
 
     def exec(self):
         print('--Exec before labels--')
-        label = self.exec_statements(self.stmts, -1)
-        for i in range(label, len(self.labels)):
-            label = self.labels[i]
-            print('--Exec label--', label)
-            stmts = self.blocks[label]
-            self.exec_statements(stmts, i)
+        i = self.exec_statements(self.stmts, -1)
+        while i < len(self.labels):
+            label_id = self.labels[i]
+            print('--Exec label--', label_id)
+            stmts = self.blocks[label_id]
+            i = self.exec_statements(stmts, i)
 
 
 class Statement(Node):
@@ -81,11 +81,17 @@ class Label(Node):
 
 
 class GoTo(Node):
-    def __init__(self, label: Label) -> None:
+    def __init__(self, label: Label, condition: ValueItem) -> None:
         self.label = label
+        self.condition = condition
 
     def exec(self) -> Label:
+        if self.condition:
+            if self.condition.exec():
+                return self.label
+            return None
         return self.label
+
 
 
 class Var(ValueItem):
@@ -98,18 +104,18 @@ class Var(ValueItem):
         return self.value
 
 
-class VarAssign(Node):
+class VarAssign(TypedItem):
     def __init__(self, varL, varR):
+        super().__init__(varL.value_type)
         self.varL = varL
         self.varR = varR
 
     def exec(self):
         self.varL.value = self.varR.exec()
-        print(self.varL.value_type + " " + self.varL.id + " : " + str(self.varL.value))
-        return self.varL
+        return self.varL.exec()
 
 
-class Expr(TypedItem):
+class Operators(TypedItem):
     def __init__(self, var, operator):
         super().__init__(var.value_type)
         self.var = var

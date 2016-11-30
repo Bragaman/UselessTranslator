@@ -25,7 +25,7 @@ def p_statements_list(p):
 
 
 def p_statement(p):
-    '''statement : exp LE
+    '''statement : op LE
                  | var_def LE
                  | go_to LE
                  | label LE
@@ -35,8 +35,15 @@ def p_statement(p):
 
 
 def p_go_to(p):
-    '''go_to : GO_TO label'''
-    p[0] = GoTo(p[2])
+    '''go_to : GO_TO label
+             | exp GO_TO label'''
+    if len(p) == 3:
+        p[0] = GoTo(p[2], None)
+    elif p[1].value_type == type_bool:
+        p[0] = GoTo(p[3], p[1])
+    else:
+        print('VALUE TYPE ERROR: condition should be Bool, at line:', p.lineno(2))
+
 
 
 def p_var_def(p):
@@ -46,7 +53,7 @@ def p_var_def(p):
                | var ASSIGN condition
                '''
 
-    if len(p) == 3:
+    if len(p) == 2:
         p[0] = p[1]
     else:
         if p[1].value_type == p[3].value_type:
@@ -80,8 +87,8 @@ def p_literal(p):
         p[0] = Literal(l, type_int)
 
 
-def p_int_op(p):
-    '''exp : TYPE OP INT'''
+def p_op(p):
+    '''op : TYPE OP INT'''
 
     if p[1] == ',':
         var = get_from_global(p[3], type_int)
@@ -90,18 +97,23 @@ def p_int_op(p):
             op_str = '++'
         if p[2] == '*':
             op_str = '--'
-        p[0] = Expr(var, op_str)
+        p[0] = Operators(var, op_str)
 
 
 def p_conditions(p):
-    '''condition : var EQ literal
-                 | exp EQ literal
-                 | var_def EQ literal
-                 | condition EQ literal'''
+    '''condition :  exp EQ literal'''
     if p[1].value_type != p[3].value_type:
         print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
     p[0] = Condition(p[1], p[3])
 
+
+def p_exp(p):
+    '''exp : var
+           | op
+           | var_def
+           | condition
+           '''
+    p[0] = p[1]
 
 
 def p_empty(p):
