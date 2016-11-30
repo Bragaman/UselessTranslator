@@ -2,6 +2,9 @@ type_int = 'integer'
 type_bool = 'bool'
 type_label = 'label'
 
+global_labels = []
+global_blocks = {}
+
 
 class Node:
     def exec(self):

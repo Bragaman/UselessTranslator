@@ -15,7 +15,7 @@ reserved = {
     # 'tp': 'MOVEROB',
 }
 
-literals = "{}()"
+literals = "{}()-"
 tokens += list(set(reserved.values()))
 
 t_INT = r'\d+'

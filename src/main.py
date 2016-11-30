@@ -9,8 +9,16 @@ if __name__ == "__main__":
     parser = yacc.yacc(module=parserrules)
 
     code = '''
-    ,1 <- ,2 <- 15
-    ,3 <- ,#2
+    ,1 <- ,2 <- 2
+    ,2 <- 0
+    while (,1 eq -1) eq F {
+        ,*1
+        (,1 eq 12) eq F please ~3
+            ,#2
+        ~3
+    }
+    ,2
+
     '''
 
     ast = parser.parse(code)

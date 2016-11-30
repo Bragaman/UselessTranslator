@@ -62,12 +62,18 @@ def p_label(p):
 
 def p_literal(p):
     '''literal : INT
-               | BOOL'''
-    l = p[1]
+               | BOOL
+               | '-' INT '''
+    l = ''
+    if len(p) == 3:
+        l = '-'+p[2]
+    else:
+        l = p[1]
     if l == 'T' or l == 'F':
         p[0] = Literal(l, type_bool)
     else:
         p[0] = Literal(l, type_int)
+
 
 
 def p_var_def(p):
