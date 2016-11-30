@@ -120,17 +120,18 @@ def p_exp(p):
            | literal
            | '(' exp ')'
            '''
-    if len(p) == 2:
+    l = len(p)
+    if l == 2:
         p[0] = p[1]
-    else:
+    elif l == 4:
         p[0] = p[2]
 
 
 def p_conditions(p):
-    '''condition :  exp EQ exp'''
+    '''condition :  exp COMPARE exp'''
     if p[1].value_type != p[3].value_type:
         print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
-    p[0] = Condition(p[1], p[3])
+    p[0] = Condition(p[1], p[3], p[2])
 
 
 def p_while(p):

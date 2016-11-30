@@ -159,16 +159,22 @@ class Operators(TypedItem):
 
 
 class Condition(TypedItem):
-    def __init__(self, varL, varR):
+    operators = {
+        'eq': lambda r, l: r == l,
+        'neq': lambda r, l: r != l,
+    }
+
+    def __init__(self, varL, varR, operator):
         super().__init__(type_bool)
         self.varR = varR
         self.varL = varL
+        self.operator = operator
 
     def exec(self):
         print('---exec condition ---')
         r = self.varR.exec()
         l = self.varL.exec()
-        return r == l
+        return Condition.operators[self.operator](r, l)
 
 
 class Literal(ValueItem):

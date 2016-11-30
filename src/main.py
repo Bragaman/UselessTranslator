@@ -13,7 +13,7 @@ if __name__ == "__main__":
     $1 <- {
         ,*2
     }
-    while (,2 eq 5) eq F {
+    while ,2 neq 5 {
         $1
     }
     '''
