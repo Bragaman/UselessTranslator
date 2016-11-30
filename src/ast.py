@@ -1,6 +1,7 @@
 type_int = 'integer'
 type_bool = 'bool'
 type_label = 'label'
+type_func = 'function'
 
 global_labels = []
 global_blocks = {}
@@ -85,6 +86,15 @@ class While(Node):
             self.stmts.exec()
 
 
+class Function(Node):
+    def __init__(self, stmts: Statements) ->None:
+        self.stmts = stmts
+
+    def exec(self):
+        if self.stmts:
+            self.stmts.exec()
+
+
 class Label(Node):
     def __init__(self, value):
         self.value = value
@@ -112,8 +122,11 @@ class Var(ValueItem):
         self.id = id
 
     def exec(self):
-        print(self.value_type + " " + self.id + " : " + str(self.value))
-        return self.value
+        if self.value_type == type_func:
+            return self.value.exec()
+        else:
+            print(self.value_type + " " + self.id + " : " + str(self.value))
+            return self.value
 
 
 class VarAssign(TypedItem):
@@ -123,8 +136,10 @@ class VarAssign(TypedItem):
         self.varR = varR
 
     def exec(self):
-        self.varL.value = self.varR.exec()
-        return self.varL.exec()
+        if self.value_type == type_func:
+            self.varL.value = self.varR.stmts
+        else:
+            self.varL.value = self.varR.exec()
 
 
 class Operators(TypedItem):
@@ -168,7 +183,8 @@ class Literal(ValueItem):
                 return True
             else:
                 return False
-        # TODO add functions
+        if self.value_type == type_func:
+            return None
 
 
 class Empty(Node):

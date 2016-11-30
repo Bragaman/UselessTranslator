@@ -1,13 +1,13 @@
 tokens = [
     'INT', 'LE', 'ASSIGN',
     'TYPE', 'BOOL', 'LABEL',
-    'OP', 'EQ', 'GO_TO', 'WHILE'
+    'OP', 'EQ', 'GO_TO', 'WHILE',
+    'PASS'
 ]
 
 reserved = {
     ':': 'ARRAY',
     '-': 'ARRAY_OPTIONAL',
-    'np': 'PASS',
     # 'mf': 'MOVEROB',
     # 'mb': 'MOVEROB',
     # 'ml': 'MOVEROB',
@@ -27,6 +27,7 @@ t_OP = r'\#|\*'
 t_EQ = r'eq'
 t_GO_TO = r'please'
 t_WHILE = r'while'
+t_PASS = r'np'
 # Ignored characters
 t_ignore = " \t"
 

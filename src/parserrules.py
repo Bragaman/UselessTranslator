@@ -29,7 +29,7 @@ def p_statement(p):
                  | var_def LE
                  | go_to LE
                  | label LE
-                 | while
+                 | while LE
                  | empty
                  '''
     p[0] = Statement(p[1])
@@ -53,6 +53,8 @@ def p_var(p):
         p[0] = get_from_global(p[2], type_int)
     if p[1] == '.':
         p[0] = get_from_global(p[2], type_bool)
+    if p[1] == '$':
+        p[0] = get_from_global(p[2], type_func)
 
 
 def p_label(p):
@@ -63,7 +65,8 @@ def p_label(p):
 def p_literal(p):
     '''literal : INT
                | BOOL
-               | '-' INT '''
+               | '-' INT
+               | PASS'''
     l = ''
     if len(p) == 3:
         l = '-'+p[2]
@@ -71,30 +74,29 @@ def p_literal(p):
         l = p[1]
     if l == 'T' or l == 'F':
         p[0] = Literal(l, type_bool)
+    elif l == 'np':
+        p[0] = Literal(l, type_func)
     else:
         p[0] = Literal(l, type_int)
-
 
 
 def p_var_def(p):
     '''var_def : var
                | var ASSIGN exp
+               | var ASSIGN '{' statements '}'
+               | var ASSIGN PASS
                '''
-
-    # '''var_def : var
-    #            | var ASSIGN literal
-    #            | var ASSIGN var
-    #            | var ASSIGN condition
-    #            '''
-
-    if len(p) == 2:
+    l = len(p)
+    if l == 2:
         p[0] = p[1]
-    else:
+    elif l == 4:
         if p[1].value_type == p[3].value_type:
             p[0] = VarAssign(p[1], p[3])
         else:
             p[0] = p[1]
             print('Syntax error', p.lineno(2))
+    else:
+        p[0] = VarAssign(p[1], Function(p[4]))
 
 
 
@@ -114,7 +116,6 @@ def p_op(p):
 def p_exp(p):
     '''exp : var
            | op
-           | var_def
            | condition
            | literal
            | '(' exp ')'
@@ -137,7 +138,6 @@ def p_while(p):
     if p[2].value_type != type_bool:
         print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
     p[0] = While(p[2], p[4])
-
 
 
 def p_empty(p):
