@@ -121,12 +121,10 @@ def p_op(p):
 def p_binding(p):
     '''bind : var BIND var'''
     if p[3].value_type == type_func:
-        p[0] = Bind(p[1], p[3])
+        p[0] = Bind(p[1], p[3], p[2])
     else:
         p[0] = p[1]
         errors_list.append("VALUE TYPE ERROR: second binding var must be func, at line: {}".format(p.lineno(2)))
-
-
 
 
 def p_exp(p):

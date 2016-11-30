@@ -2,7 +2,8 @@ tokens = [
     'INT', 'LE', 'ASSIGN',
     'TYPE', 'BOOL', 'LABEL',
     'OP', 'GO_TO', 'WHILE',
-    'PASS', 'COMPARE', 'BIND'
+    'PASS', 'COMPARE',
+    'BIND'
 ]
 
 reserved_map = {
@@ -28,7 +29,7 @@ t_GO_TO = r'please'
 t_WHILE = r'while'
 t_PASS = r'np'
 t_COMPARE = r'eq|neq'
-t_BIND = r'@'
+t_BIND = r'@|%'
 # Ignored characters
 t_ignore = " \t"
 

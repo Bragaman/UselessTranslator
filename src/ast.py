@@ -129,12 +129,13 @@ class Var(ValueItem):
         self.is_in_func = False
 
     def exec(self):
-        if not self.is_in_func:
+        if not self.is_in_func and len(self.binding_funcs) > 0:
             print('----Start exec BINDING FUNC-----')
             self.is_in_func = True
             for binding_func in self.binding_funcs:
                 binding_func.exec()
             self.is_in_func = False
+            print('----Finish exec BINDING FUNC-----')
         if self.value_type == type_func:
             return self.value.exec()
         else:
@@ -151,8 +152,10 @@ class VarAssign(TypedItem):
     def exec(self):
         if self.value_type == type_func:
             self.varL.value = self.varR.stmts
+            return None
         else:
             self.varL.value = self.varR.exec()
+            return self.varL.exec()
 
 
 class Operators(TypedItem):
@@ -172,14 +175,20 @@ class Operators(TypedItem):
 
 
 class Bind(Node):
-    def __init__(self, var: Var, var_func: Var) -> None:
+    def __init__(self, var: Var, var_func: Var, action: str) -> None:
         self.var = var
         self.var_func = var_func
+        self.action = action
 
     def exec(self) -> bool:
-        self.var.binding_funcs.append(self.var_func)
-        # TODO add check
-        return True
+        if self.action == '@':
+            self.var.binding_funcs.append(self.var_func)
+            # TODO add check
+            return True
+        if self.action == '%':
+            self.var.binding_funcs.remove(self.var_func)
+            return True
+        return False
 
 
 class Condition(TypedItem):

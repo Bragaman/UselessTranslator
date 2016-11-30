@@ -18,6 +18,8 @@ if __name__ == "__main__":
     ,2 <- 10
     ,2 @ $1
     ,2
+    ,2 % $1
+    ,2 <- 10
     '''
 
     ast = parser.parse(code)
