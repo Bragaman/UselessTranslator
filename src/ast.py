@@ -137,7 +137,8 @@ class Var(ValueItem):
             self.is_in_func = False
             print('----Finish exec BINDING FUNC-----')
         if self.value_type == type_func:
-            return self.value.exec()
+            if self.value:
+                return self.value.exec()
         else:
             print(self.value_type + " " + self.id + " : " + str(self.value))
             return self.value
@@ -151,7 +152,10 @@ class VarAssign(TypedItem):
 
     def exec(self):
         if self.value_type == type_func:
-            self.varL.value = self.varR.stmts
+            if isinstance(self.varR, Var):
+                self.varL.value = self.varR.value
+            elif isinstance(self.varR, Function):
+                self.varL.value = self.varR.stmts
             return None
         else:
             self.varL.value = self.varR.exec()
@@ -186,7 +190,10 @@ class Bind(Node):
             # TODO add check
             return True
         if self.action == '%':
-            self.var.binding_funcs.remove(self.var_func)
+            try:
+                self.var.binding_funcs.remove(self.var_func)
+            except ValueError:
+                pass
             return True
         return False
 
