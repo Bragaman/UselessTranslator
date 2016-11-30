@@ -72,6 +72,16 @@ class Statement(Node):
         return self.stmt.exec()
 
 
+class While(Node):
+    def __init__(self, condition: ValueItem, stmts: Statements) -> None:
+        self.condition = condition
+        self.stmts = stmts
+
+    def exec(self):
+        while self.condition.exec():
+            self.stmts.exec()
+
+
 class Label(Node):
     def __init__(self, value):
         self.value = value
@@ -91,7 +101,6 @@ class GoTo(Node):
                 return self.label
             return None
         return self.label
-
 
 
 class Var(ValueItem):
@@ -132,16 +141,16 @@ class Operators(TypedItem):
 
 
 class Condition(TypedItem):
-    def __init__(self, value, literal):
+    def __init__(self, varL, varR):
         super().__init__(type_bool)
-        self.literal = literal
-        self.value = value
+        self.varR = varR
+        self.varL = varL
 
     def exec(self):
         print('---exec condition ---')
-        v = self.value.exec()
-        l = self.literal.exec()
-        return v == l
+        r = self.varR.exec()
+        l = self.varL.exec()
+        return r == l
 
 
 class Literal(ValueItem):

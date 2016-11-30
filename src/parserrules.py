@@ -29,6 +29,7 @@ def p_statement(p):
                  | var_def LE
                  | go_to LE
                  | label LE
+                 | while
                  | empty
                  '''
     p[0] = Statement(p[1])
@@ -43,24 +44,6 @@ def p_go_to(p):
         p[0] = GoTo(p[3], p[1])
     else:
         print('VALUE TYPE ERROR: condition should be Bool, at line:', p.lineno(2))
-
-
-
-def p_var_def(p):
-    '''var_def : var
-               | var ASSIGN literal
-               | var ASSIGN var
-               | var ASSIGN condition
-               '''
-
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        if p[1].value_type == p[3].value_type:
-            p[0] = VarAssign(p[1], p[3])
-        else:
-            p[0] = p[1]
-            print('Syntax error', p.lineno(2))
 
 
 def p_var(p):
@@ -87,6 +70,28 @@ def p_literal(p):
         p[0] = Literal(l, type_int)
 
 
+def p_var_def(p):
+    '''var_def : var
+               | var ASSIGN exp
+               '''
+
+    # '''var_def : var
+    #            | var ASSIGN literal
+    #            | var ASSIGN var
+    #            | var ASSIGN condition
+    #            '''
+
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        if p[1].value_type == p[3].value_type:
+            p[0] = VarAssign(p[1], p[3])
+        else:
+            p[0] = p[1]
+            print('Syntax error', p.lineno(2))
+
+
+
 def p_op(p):
     '''op : TYPE OP INT'''
 
@@ -100,20 +105,33 @@ def p_op(p):
         p[0] = Operators(var, op_str)
 
 
-def p_conditions(p):
-    '''condition :  exp EQ literal'''
-    if p[1].value_type != p[3].value_type:
-        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
-    p[0] = Condition(p[1], p[3])
-
-
 def p_exp(p):
     '''exp : var
            | op
            | var_def
            | condition
+           | literal
+           | '(' exp ')'
            '''
-    p[0] = p[1]
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[2]
+
+
+def p_conditions(p):
+    '''condition :  exp EQ exp'''
+    if p[1].value_type != p[3].value_type:
+        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
+    p[0] = Condition(p[1], p[3])
+
+
+def p_while(p):
+    '''while : WHILE exp '{' statements '}' '''
+    if p[2].value_type != type_bool:
+        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
+    p[0] = While(p[2], p[4])
+
 
 
 def p_empty(p):

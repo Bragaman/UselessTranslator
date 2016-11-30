@@ -1,20 +1,21 @@
 tokens = [
     'INT', 'LE', 'ASSIGN',
     'TYPE', 'BOOL', 'LABEL',
-    'OP', 'EQ', 'GO_TO'
+    'OP', 'EQ', 'GO_TO', 'WHILE'
 ]
 
 reserved = {
     ':': 'ARRAY',
     '-': 'ARRAY_OPTIONAL',
     'np': 'PASS',
-    'mf': 'MOVEROB',
-    'mb': 'MOVEROB',
-    'ml': 'MOVEROB',
-    'mr': 'MOVEROB',
-    'tp': 'MOVEROB',
+    # 'mf': 'MOVEROB',
+    # 'mb': 'MOVEROB',
+    # 'ml': 'MOVEROB',
+    # 'mr': 'MOVEROB',
+    # 'tp': 'MOVEROB',
 }
 
+literals = "{}()"
 tokens += list(set(reserved.values()))
 
 t_INT = r'\d+'
@@ -25,6 +26,7 @@ t_LABEL = r'\~'
 t_OP = r'\#|\*'
 t_EQ = r'eq'
 t_GO_TO = r'please'
+t_WHILE = r'while'
 # Ignored characters
 t_ignore = " \t"
 
