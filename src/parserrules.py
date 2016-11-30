@@ -2,11 +2,17 @@ from tokenrules import tokens
 from ast import *
 
 global_var = {}
+precedence = (
+    ('right', 'ASSIGN'),
+    ('nonassoc', 'COMPARE'),
+    )
 
 
 def get_from_global(id, type):
     if id not in global_var:
         global_var[id] = Var(id, None, type)
+    if global_var[id].value_type != type:
+        errors_list.append("VALUE TYPE ERROR: in variable with ID {}".format(id))
     return global_var[id]
 
 
@@ -43,7 +49,7 @@ def p_go_to(p):
     elif p[1].value_type == type_bool:
         p[0] = GoTo(p[3], p[1])
     else:
-        print('VALUE TYPE ERROR: condition should be Bool, at line:', p.lineno(2))
+        errors_list.append("VALUE TYPE ERROR: condition should be Bool, at line: {}".format(p.lineno(2)))
 
 
 def p_var(p):
@@ -94,7 +100,7 @@ def p_var_def(p):
             p[0] = VarAssign(p[1], p[3])
         else:
             p[0] = p[1]
-            print('Syntax error', p.lineno(2))
+            errors_list.append('Syntax error, at line: {}'.format(p.lineno(2)))
     else:
         p[0] = VarAssign(p[1], Function(p[4]))
 
@@ -130,14 +136,14 @@ def p_exp(p):
 def p_conditions(p):
     '''condition :  exp COMPARE exp'''
     if p[1].value_type != p[3].value_type:
-        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
+        errors_list.append("VALUE TYPE ERROR: condition will be false, at line: {}".at(p.lineno(2)))
     p[0] = Condition(p[1], p[3], p[2])
 
 
 def p_while(p):
     '''while : WHILE exp '{' statements '}' '''
     if p[2].value_type != type_bool:
-        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
+        errors_list.append("VALUE TYPE ERROR: condition will be false, at line: {}".format(p.lineno(2)))
     p[0] = While(p[2], p[4])
 
 
@@ -148,4 +154,4 @@ def p_empty(p):
 
 
 def p_error(p):
-    print('Unexpected token:', p)
+    errors_list.append("Unexpected token: {}".format(p))

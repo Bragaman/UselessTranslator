@@ -5,6 +5,7 @@ type_func = 'function'
 
 global_labels = []
 global_blocks = {}
+errors_list = []
 
 
 class Node:
