@@ -90,7 +90,7 @@ def p_int_op(p):
             op_str = '++'
         if p[2] == '*':
             op_str = '--'
-        p[0] = Expr(var, type_int, op_str)
+        p[0] = Expr(var, op_str)
 
 
 def p_conditions(p):

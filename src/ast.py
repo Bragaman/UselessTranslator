@@ -3,18 +3,24 @@ type_bool = 'bool'
 type_label = 'label'
 
 
-def converter(type, value):
-    if type == type_int:
-        return int(value)
-    if type == type_bool:
-        if value == 'T':
-            return True
-        else:
-            return False
-    # TODO add functions
-
-
 class Node:
+    def exec(self):
+        raise NotImplementedError
+
+
+class TypedItem(Node):
+    def __init__(self, type):
+        self.value_type = type
+
+    def exec(self):
+        raise NotImplementedError
+
+
+class ValueItem(TypedItem):
+    def __init__(self, value, type):
+        super().__init__(type)
+        self.value = value
+
     def exec(self):
         raise NotImplementedError
 
@@ -66,14 +72,6 @@ class Statement(Node):
         return self.stmt.exec()
 
 
-class GoTo(Node):
-    def __init__(self, label):
-        self.label = label
-
-    def exec(self):
-        return self.label
-
-
 class Label(Node):
     def __init__(self, value):
         self.value = value
@@ -82,11 +80,18 @@ class Label(Node):
         return self.value
 
 
-class Var(Node):
+class GoTo(Node):
+    def __init__(self, label: Label) -> None:
+        self.label = label
+
+    def exec(self) -> Label:
+        return self.label
+
+
+class Var(ValueItem):
     def __init__(self, id, value, value_type):
+        super().__init__(value, value_type)
         self.id = id
-        self.value = value
-        self.value_type = value_type
 
     def exec(self):
         print(self.value_type + " " + self.id + " : " + str(self.value))
@@ -104,27 +109,27 @@ class VarAssign(Node):
         return self.varL
 
 
-class Expr(Node):
-    def __init__(self, var, type, operator):
+class Expr(TypedItem):
+    def __init__(self, var, operator):
+        super().__init__(var.value_type)
         self.var = var
         self.operator = operator
-        self.value_type = type
 
     def exec(self):
         if self.operator == '--':
             print('---exec op decrement---')
-            self.var.value = int(self.var.exec()) - 1
+            self.var.value -= 1
         if self.operator == '++':
             print('---exec op increment---')
-            self.var.value = int(self.var.exec()) + 1
+            self.var.value += 1
         return self.var.exec()
 
 
-class Condition(Node):
+class Condition(TypedItem):
     def __init__(self, value, literal):
-        self.value = value
+        super().__init__(type_bool)
         self.literal = literal
-        self.value_type = type_bool
+        self.value = value
 
     def exec(self):
         print('---exec condition ---')
@@ -133,13 +138,19 @@ class Condition(Node):
         return v == l
 
 
-class Literal(Node):
+class Literal(ValueItem):
     def __init__(self, value, value_type):
-        self.value = value
-        self.value_type = value_type
+        super().__init__(value, value_type)
 
     def exec(self):
-        return converter(self.value_type, self.value)
+        if self.value_type == type_int:
+            return int(self.value)
+        if self.value_type == type_bool:
+            if self.value == 'T':
+                return True
+            else:
+                return False
+        # TODO add functions
 
 
 class Empty(Node):
