@@ -83,8 +83,10 @@ class While(Node):
         self.stmts = stmts
 
     def exec(self):
+        print('----Start exec while-----')
         while self.condition.exec():
             self.stmts.exec()
+        print('----Finish exec while-----')
 
 
 class Function(Node):
@@ -92,8 +94,10 @@ class Function(Node):
         self.stmts = stmts
 
     def exec(self):
+        print('----Start exec func-----')
         if self.stmts:
             self.stmts.exec()
+        print('----Finish exec while-----')
 
 
 class Label(Node):
@@ -121,8 +125,16 @@ class Var(ValueItem):
     def __init__(self, id, value, value_type):
         super().__init__(value, value_type)
         self.id = id
+        self.binding_funcs = []
+        self.is_in_func = False
 
     def exec(self):
+        if not self.is_in_func:
+            print('----Start exec BINDING FUNC-----')
+            self.is_in_func = True
+            for binding_func in self.binding_funcs:
+                binding_func.exec()
+            self.is_in_func = False
         if self.value_type == type_func:
             return self.value.exec()
         else:
@@ -157,6 +169,17 @@ class Operators(TypedItem):
             print('---exec op increment---')
             self.var.value += 1
         return self.var.exec()
+
+
+class Bind(Node):
+    def __init__(self, var: Var, var_func: Var) -> None:
+        self.var = var
+        self.var_func = var_func
+
+    def exec(self) -> bool:
+        self.var.binding_funcs.append(self.var_func)
+        # TODO add check
+        return True
 
 
 class Condition(TypedItem):

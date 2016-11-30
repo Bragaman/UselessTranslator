@@ -31,13 +31,14 @@ def p_statements_list(p):
 
 
 def p_statement(p):
-    '''statement : op LE
+    '''statement : exp LE
                  | var_def LE
                  | go_to LE
                  | label LE
                  | while LE
                  | empty
                  '''
+
     p[0] = Statement(p[1])
 
 
@@ -105,10 +106,8 @@ def p_var_def(p):
         p[0] = VarAssign(p[1], Function(p[4]))
 
 
-
 def p_op(p):
     '''op : TYPE OP INT'''
-
     if p[1] == ',':
         var = get_from_global(p[3], type_int)
         op_str = ''
@@ -119,12 +118,24 @@ def p_op(p):
         p[0] = Operators(var, op_str)
 
 
+def p_binding(p):
+    '''bind : var BIND var'''
+    if p[3].value_type == type_func:
+        p[0] = Bind(p[1], p[3])
+    else:
+        p[0] = p[1]
+        errors_list.append("VALUE TYPE ERROR: second binding var must be func, at line: {}".format(p.lineno(2)))
+
+
+
+
 def p_exp(p):
     '''exp : var
            | op
            | condition
            | literal
            | '(' exp ')'
+           | bind
            '''
     l = len(p)
     if l == 2:

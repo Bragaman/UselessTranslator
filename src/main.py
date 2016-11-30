@@ -10,13 +10,14 @@ if __name__ == "__main__":
     parser = yacc.yacc(module=parserrules)
 
     code = '''
-    $1 <-{
-        ,*2
+    $1 <- {
+        while ,2 neq 5 {
+            ,*2
+        }
     }
     ,2 <- 10
-    while .2 neq 5 {
-        $1
-    }
+    ,2 @ $1
+    ,2
     '''
 
     ast = parser.parse(code)
