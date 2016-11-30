@@ -90,7 +90,6 @@ class Var(Node):
 
     def exec(self):
         print(self.value_type + " " + self.id + " : " + str(self.value))
-        # return converter(self.value_type, self.value)
         return self.value
 
 
@@ -109,7 +108,7 @@ class Expr(Node):
     def __init__(self, var, type, operator):
         self.var = var
         self.operator = operator
-        self.type = type
+        self.value_type = type
 
     def exec(self):
         if self.operator == '--':
@@ -131,10 +130,7 @@ class Condition(Node):
         print('---exec condition ---')
         v = self.value.exec()
         l = self.literal.exec()
-        if v == l:
-            return 'T'
-        else:
-            return 'F'
+        return v == l
 
 
 class Literal(Node):
@@ -143,8 +139,7 @@ class Literal(Node):
         self.value_type = value_type
 
     def exec(self):
-        # return converter(self.value_type, self.value)
-        return self.value
+        return converter(self.value_type, self.value)
 
 
 class Empty(Node):

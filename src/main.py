@@ -14,6 +14,7 @@ if __name__ == "__main__":
     ,*1
     ~2
     ,*1
+    .3 <- ,1 eq 9
     '''
 
     ast = parser.parse(code)

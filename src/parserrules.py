@@ -98,7 +98,10 @@ def p_conditions(p):
                  | exp EQ literal
                  | var_def EQ literal
                  | condition EQ literal'''
+    if p[1].value_type != p[3].value_type:
+        print('VALUE TYPE ERROR: condition will be false, at line:', p.lineno(2))
     p[0] = Condition(p[1], p[3])
+
 
 
 def p_empty(p):
