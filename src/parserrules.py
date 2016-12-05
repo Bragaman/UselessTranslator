@@ -47,11 +47,14 @@ def p_var(p):
     '''var : TYPE INT'''
 
     if p[1] == ',':
-        p[0] = get_from_global(p[2], type_int)
+        # p[0] = get_from_global(p[2], type_int)
+        p[0] = Var(p[2], None, type_int)
     if p[1] == '.':
-        p[0] = get_from_global(p[2], type_bool)
+        p[0] = Var(p[2], None, type_bool)
+        # p[0] = get_from_global(p[2], type_bool)
     if p[1] == '$':
-        p[0] = get_from_global(p[2], type_func)
+        p[0] = Var(p[2], None, type_func)
+        # p[0] = get_from_global(p[2], type_func)
 
 
 def p_index(p):
@@ -116,7 +119,7 @@ def p_var_def(p):
 def p_op(p):
     '''op : TYPE OP INT'''
     if p[1] == ',':
-        var = get_from_global(p[3], type_int)
+        var = Var(p[3], None, type_int)
         op_str = ''
         if p[2] == '#':
             op_str = '++'

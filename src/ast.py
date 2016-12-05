@@ -167,7 +167,17 @@ class Var(ValueItem):
         self.binding_funcs = []
         self.is_in_func = False
 
+    def init_from_global(self):
+        tmp = get_from_global(self.id, self.value_type)
+        self.value = tmp.value
+        self.binding_funcs = tmp.binding_funcs
+
+    def sync_with_global(self):
+        global_var[self.id].value = self.value
+        global_var[self.id].binding_funcs = self.binding_funcs
+
     def exec(self):
+        self.init_from_global()
         if not self.is_in_func and len(self.binding_funcs) > 0:
             print('----Start exec BINDING FUNC-----')
             self.is_in_func = True
@@ -188,21 +198,26 @@ class Var(ValueItem):
 
 
 class VarAssign(TypedItem):
-    def __init__(self, varL, varR):
-        super().__init__(varL.value_type)
-        self.varL = varL
-        self.varR = varR
+    def __init__(self, var_l: Var, var_r: Node) -> None:
+        super().__init__(var_l.value_type)
+        self.varL = var_l
+        self.varR = var_r
 
     def exec(self):
+        result = None
+        self.varL.init_from_global()
         if self.value_type == type_func:
             if isinstance(self.varR, Var):
+                self.varR.init_from_global()
                 self.varL.value = self.varR.value
             elif isinstance(self.varR, Function):
                 self.varL.value = self.varR.stmts
-            return None
+            self.varL.sync_with_global()
         else:
             self.varL.value = self.varR.exec()
-            return self.varL.exec()
+            self.varL.sync_with_global()
+            result = self.varL.exec()
+        return result
 
 
 class Operators(TypedItem):
@@ -212,12 +227,14 @@ class Operators(TypedItem):
         self.operator = operator
 
     def exec(self):
+        self.var.init_from_global()
         if self.operator == '--':
             print('---exec op decrement---')
             self.var.value -= 1
         if self.operator == '++':
             print('---exec op increment---')
             self.var.value += 1
+        self.var.sync_with_global()
         return self.var.exec()
 
 
@@ -228,17 +245,21 @@ class Bind(Node):
         self.action = action
 
     def exec(self) -> bool:
+        self.var.init_from_global()
+        self.var_func.init_from_global()
+        result = True
         if self.action == '@':
             self.var.binding_funcs.append(self.var_func)
             # TODO add check
-            return True
+
         if self.action == '%':
             try:
                 self.var.binding_funcs.remove(self.var_func)
             except ValueError:
                 pass
-            return True
-        return False
+
+        self.var.sync_with_global()
+        return result
 
 
 class Condition(TypedItem):
