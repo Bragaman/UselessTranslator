@@ -6,6 +6,7 @@ precedence = (
     ('nonassoc', 'COMPARE'),
 )
 
+
 def p_statements(p):
     '''statements : statements_list'''
     p[0] = Statements(p[1])
@@ -43,20 +44,6 @@ def p_go_to(p):
         errors_list.append("VALUE TYPE ERROR: condition should be Bool, at line: {}".format(p.lineno(2)))
 
 
-def p_var(p):
-    '''var : TYPE INT'''
-
-    if p[1] == ',':
-        # p[0] = get_from_global(p[2], type_int)
-        p[0] = Var(p[2], None, type_int)
-    if p[1] == '.':
-        p[0] = Var(p[2], None, type_bool)
-        # p[0] = get_from_global(p[2], type_bool)
-    if p[1] == '$':
-        p[0] = Var(p[2], None, type_func)
-        # p[0] = get_from_global(p[2], type_func)
-
-
 def p_index(p):
     '''index : var
              | literal
@@ -66,12 +53,50 @@ def p_index(p):
     p[0] = p[1]
 
 
+def p_indexes(p):
+    '''indexes : indexes '-' index
+               | '''
+
+    if len(p) > 1:
+        p[0] = p[1] + [p[3]]
+    else:
+        p[0] = []
+
+
 def p_array(p):
     '''array_var : TYPE INT ARRAY
-                 | TYPE INT ARRAY index
-                 | array_var ARRAY_OPTIONAL index'''
-    # TODO add array node
-    pass
+                  | TYPE INT ARRAY index
+                  | TYPE INT ARRAY index indexes'''
+    l = len(p)
+    indexes = list()
+    if l == 4:
+        indexes.append(Literal(0, type_int))
+    elif l == 5:
+        indexes.append(p[4])
+    elif l == 6:
+        indexes.append(p[4])
+        indexes += (p[5])
+    if p[1] == ',':
+        p[0] = Array(p[2], None, type_int, indexes)
+    if p[1] == '.':
+        p[0] = Array(p[2], None, type_bool, indexes)
+    if p[1] == '$':
+        p[0] = Array(p[2], None, type_func, indexes)
+
+
+def p_var(p):
+    '''var : TYPE INT
+           | array_var'''
+
+    if len(p) == 3:
+        if p[1] == ',':
+            p[0] = Var(p[2], None, type_int)
+        if p[1] == '.':
+            p[0] = Var(p[2], None, type_bool)
+        if p[1] == '$':
+            p[0] = Var(p[2], None, type_func)
+    else:
+        p[0] = p[1]
 
 
 def p_label(p):

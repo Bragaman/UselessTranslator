@@ -9,27 +9,62 @@ global_var = {}
 idToType = {}
 errors_list = []
 
+
+class DataNode:
+    def __init__(self, data):
+        self.data = data
+        self.children = []
+
+    def add_child(self, obj):
+        self.children.append(obj)
+
+    def find_child(self, data):
+        for child in self.children:
+            if child.data == data:
+                return child
+        return None
+
+
+def rec_add(indexes, i, start):
+    if i < len(indexes):
+        ind = indexes[i]
+        i += 1
+        if isinstance(ind, Array):
+            if len(start.children) == 0:
+                child = DataNode(Array(id, None, type, indexes))
+                start.add_child(child)
+                # print(child.data.id, ';')
+                return child.data
+            return start.children[0].data
+        else:
+            index = ind.exec()
+            # print(index, '->')
+            child = start.find_child(index)
+            if not child:
+                child = DataNode(index)
+                start.add_child(child)
+            return rec_add(indexes, i, child)
+
+
 def get_from_global_array(id, type, indexes):
     check_type = idToType.get(id, None)
-    root = None
     if check_type == type:
         root = global_var[id]
+        # print('start array')
+        indexes.append(Array(id, None, type, indexes))
+        return rec_add(indexes, 0, root)
+
     elif not check_type:
         idToType[id] = type
+        root = DataNode(id)
+        indexes.append(Array(id, None, type, indexes))
+        result = rec_add(indexes, 0, root)
+
+        global_var[id] = root
+        return result
     else:
         errors_list.append("VALUE TYPE ERROR: in variable with ID {}".format(id))
-
-    cur = root
-    for index in indexes:
-        if isinstance(cur, dict):
-            if index not in cur:
-                cur[index] = dict()
-            cur = cur.get(index)
-        else:
-            errors_list.append("VALUE ADDRESS ERROR: in variable with ID {}".format(id))
-    global_var[id] = cur
-
-    return global_var.get(id)
+        return Array(id, None, type, indexes)
 
 
 def get_from_global(id, type, indexes=list()):
@@ -67,6 +102,36 @@ class ValueItem(TypedItem):
 
     def exec(self):
         raise NotImplementedError
+
+
+class AbstaractVar(ValueItem):
+    def __init__(self, id, value, value_type):
+        super().__init__(value, value_type)
+        self.id = id
+        self.binding_funcs = []
+        self.is_in_func = False
+
+    def init_from_global(self):
+        raise NotImplementedError
+
+    def sync_with_global(self):
+        raise NotImplementedError
+
+    def exec(self):
+        self.init_from_global()
+        if not self.is_in_func and len(self.binding_funcs) > 0:
+            print('----Start exec BINDING FUNC-----')
+            self.is_in_func = True
+            for binding_func in self.binding_funcs:
+                binding_func.exec()
+            self.is_in_func = False
+            print('----Finish exec BINDING FUNC-----')
+        if self.value_type == type_func:
+            if self.value:
+                return self.value.exec()
+        else:
+            print(self.value_type + " " + self.id + " : " + str(self.value))
+            return self.value
 
 
 class Statements(Node):
@@ -129,7 +194,7 @@ class While(Node):
 
 
 class Function(Node):
-    def __init__(self, stmts: Statements) ->None:
+    def __init__(self, stmts: Statements) -> None:
         self.stmts = stmts
 
     def exec(self):
@@ -160,12 +225,12 @@ class GoTo(Node):
         return self.label
 
 
-class Var(ValueItem):
-    def __init__(self, id, value, value_type):
-        super().__init__(value, value_type)
-        self.id = id
-        self.binding_funcs = []
-        self.is_in_func = False
+class Var(AbstaractVar):
+    # def __init__(self, id, value, value_type):
+    #     super().__init__(value, value_type)
+    #     self.id = id
+    #     self.binding_funcs = []
+    #     self.is_in_func = False
 
     def init_from_global(self):
         tmp = get_from_global(self.id, self.value_type)
@@ -173,32 +238,55 @@ class Var(ValueItem):
         self.binding_funcs = tmp.binding_funcs
 
     def sync_with_global(self):
-        global_var[self.id].value = self.value
-        global_var[self.id].binding_funcs = self.binding_funcs
+        tmp = get_from_global(self.id, self.value_type)
+        tmp.value = self.value
+        tmp.binding_funcs = self.binding_funcs
 
-    def exec(self):
-        self.init_from_global()
-        if not self.is_in_func and len(self.binding_funcs) > 0:
-            print('----Start exec BINDING FUNC-----')
-            self.is_in_func = True
-            for binding_func in self.binding_funcs:
-                binding_func.exec()
-            self.is_in_func = False
-            print('----Finish exec BINDING FUNC-----')
-        if self.value_type == type_func:
-            if self.value:
-                return self.value.exec()
-        else:
-            print(self.value_type + " " + self.id + " : " + str(self.value))
-            return self.value
+        # def exec(self):
+        #     self.init_from_global()
+        #     if not self.is_in_func and len(self.binding_funcs) > 0:
+        #         print('----Start exec BINDING FUNC-----')
+        #         self.is_in_func = True
+        #         for binding_func in self.binding_funcs:
+        #             binding_func.exec()
+        #         self.is_in_func = False
+        #         print('----Finish exec BINDING FUNC-----')
+        #     if self.value_type == type_func:
+        #         if self.value:
+        #             return self.value.exec()
+        #     else:
+        #         print(self.value_type + " " + self.id + " : " + str(self.value))
+        #         return self.value
 
 
-# class Array(ValueItem):
-#     def __init__(self, id, value, value_type):
+class Array(AbstaractVar):
+    def __init__(self, id, value, value_type, indexes):
+        super().__init__(id, value, value_type)
+        self.indexes = indexes
+
+    def init_from_global(self):
+        l = []
+        for i in self.indexes:
+            l.append(i)
+            # l.append(i.exec())
+        tmp = get_from_global(self.id, self.value_type, l)
+        self.value = tmp.value
+        self.binding_funcs = tmp.binding_funcs
+        self.indexes = tmp.indexes
+
+    def sync_with_global(self):
+        l = []
+        for i in self.indexes:
+            # l.append(i.exec())
+            l.append(i)
+        tmp = get_from_global(self.id, self.value_type, l)
+        tmp.value = self.value
+        tmp.binding_funcs = self.binding_funcs
+        tmp.indexes = self.indexes
 
 
 class VarAssign(TypedItem):
-    def __init__(self, var_l: Var, var_r: Node) -> None:
+    def __init__(self, var_l: AbstaractVar, var_r: Node) -> None:
         super().__init__(var_l.value_type)
         self.varL = var_l
         self.varR = var_r
@@ -239,7 +327,7 @@ class Operators(TypedItem):
 
 
 class Bind(Node):
-    def __init__(self, var: Var, var_func: Var, action: str) -> None:
+    def __init__(self, var: AbstaractVar, var_func: AbstaractVar, action: str) -> None:
         self.var = var
         self.var_func = var_func
         self.action = action

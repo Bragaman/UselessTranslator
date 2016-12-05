@@ -3,12 +3,10 @@ tokens = [
     'TYPE', 'BOOL', 'LABEL',
     'OP', 'GO_TO', 'WHILE',
     'PASS', 'COMPARE',
-    'BIND'
+    'BIND', 'ARRAY'
 ]
 
 reserved_map = {
-    r':': 'ARRAY',
-    r'-': 'ARRAY_OPTIONAL',
     # 'mf': 'MOVEROB',
     # 'mb': 'MOVEROB',
     # 'ml': 'MOVEROB',
@@ -30,6 +28,7 @@ t_WHILE = r'while'
 t_PASS = r'np'
 t_COMPARE = r'eq|neq'
 t_BIND = r'@|%'
+t_ARRAY = r'\:'
 # Ignored characters
 t_ignore = " \t"
 
