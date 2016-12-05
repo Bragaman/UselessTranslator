@@ -1,20 +1,10 @@
 from tokenrules import tokens
 from ast import *
 
-global_var = {}
 precedence = (
     ('right', 'ASSIGN'),
     ('nonassoc', 'COMPARE'),
-    )
-
-
-def get_from_global(id, type):
-    if id not in global_var:
-        global_var[id] = Var(id, None, type)
-    if global_var[id].value_type != type:
-        errors_list.append("VALUE TYPE ERROR: in variable with ID {}".format(id))
-    return global_var[id]
-
+)
 
 def p_statements(p):
     '''statements : statements_list'''
@@ -64,6 +54,23 @@ def p_var(p):
         p[0] = get_from_global(p[2], type_func)
 
 
+def p_index(p):
+    '''index : var
+             | literal
+             | array_var
+             | '(' index ')' '''
+
+    p[0] = p[1]
+
+
+def p_array(p):
+    '''array_var : TYPE INT ARRAY
+                 | TYPE INT ARRAY index
+                 | array_var ARRAY_OPTIONAL index'''
+    # TODO add array node
+    pass
+
+
 def p_label(p):
     '''label : LABEL INT'''
     p[0] = Label(p[2])
@@ -76,7 +83,7 @@ def p_literal(p):
                | PASS'''
     l = ''
     if len(p) == 3:
-        l = '-'+p[2]
+        l = '-' + p[2]
     else:
         l = p[1]
     if l == 'T' or l == 'F':

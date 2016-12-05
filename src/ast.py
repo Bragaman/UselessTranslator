@@ -5,7 +5,46 @@ type_func = 'function'
 
 global_labels = []
 global_blocks = {}
+global_var = {}
+idToType = {}
 errors_list = []
+
+def get_from_global_array(id, type, indexes):
+    check_type = idToType.get(id, None)
+    root = None
+    if check_type == type:
+        root = global_var[id]
+    elif not check_type:
+        idToType[id] = type
+    else:
+        errors_list.append("VALUE TYPE ERROR: in variable with ID {}".format(id))
+
+    cur = root
+    for index in indexes:
+        if isinstance(cur, dict):
+            if index not in cur:
+                cur[index] = dict()
+            cur = cur.get(index)
+        else:
+            errors_list.append("VALUE ADDRESS ERROR: in variable with ID {}".format(id))
+    global_var[id] = cur
+
+    return global_var.get(id)
+
+
+def get_from_global(id, type, indexes=list()):
+    if len(indexes) == 0:
+        check_type = idToType.get(id, None)
+        if check_type == type:
+            pass
+        elif not check_type:
+            idToType[id] = type
+            global_var[id] = Var(id, None, type)
+        else:
+            errors_list.append("VALUE TYPE ERROR: in variable with ID {}".format(id))
+        return global_var.get(id)
+    else:
+        return get_from_global_array(id, type, indexes)
 
 
 class Node:
@@ -142,6 +181,10 @@ class Var(ValueItem):
         else:
             print(self.value_type + " " + self.id + " : " + str(self.value))
             return self.value
+
+
+# class Array(ValueItem):
+#     def __init__(self, id, value, value_type):
 
 
 class VarAssign(TypedItem):
