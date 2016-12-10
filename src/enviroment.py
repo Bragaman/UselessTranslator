@@ -35,18 +35,34 @@ class Robot:
         return self.move(0, -1)
 
 
+def load_map(path):
+    f = open(path, 'r')
+    lab = []
+    cur = None
+    for line in f:
+        row = []
+        for l in line:
+            if l == '0':
+                row.append(True)
+            elif l == '1':
+                row.append(False)
+            elif l == 'R':
+                row.append(True)
+                cur = (len(row) - 1, len(lab))
+        lab.append(row)
+    return lab, cur
 
 
 if __name__ == '__main__':
-    lab = [[True, True, True, True],
-           [True, False, False, True],
-           [False, True, True, True],
-           [True, False, False, True]
-           ]
+    lab, cur = load_map('../lab.txt')
+    print(cur)
+    print(lab)
+    if cur:
+        robot = Robot(cur[0], cur[1], 0, lab)
+    else:
+        robot = Robot(0, 0, 0, lab)
 
-    robot = Robot(0, 0, 0, lab)
     l = []
-
 
     def dfs():
         if (robot.x, robot.y) not in l:
@@ -64,26 +80,4 @@ if __name__ == '__main__':
             if robot.move_right():
                 dfs()
                 robot.move_left()
-
-    # def dfs(x, y):
-    #     if (x,y) not in l:
-    #         print(x, y)
-    #         l.append((x, y))
-    #         robot.x = x
-    #         robot.y = y
-    #         if robot.move_back():
-    #             dfs(x, y - 1)
-    #             robot.move_forward()
-    #         if robot.move_forward():
-    #             dfs(x, y + 1)
-    #             robot.move_back()
-    #         if robot.move_left():
-    #             dfs(x - 1, y)
-    #             robot.move_right()
-    #         if robot.move_right():
-    #             dfs(x + 1, y)
-    #             robot.move_left()
-
     dfs()
-    # print(robot.move_forward())
-

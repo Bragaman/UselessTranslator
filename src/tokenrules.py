@@ -3,7 +3,7 @@ tokens = [
     'TYPE', 'BOOL', 'LABEL',
     'OP', 'GO_TO', 'WHILE',
     'PASS', 'COMPARE',
-    'BIND', 'ARRAY'
+    'BIND', 'ARRAY', 'ROBOT'
 ]
 
 reserved_map = {
@@ -29,6 +29,7 @@ t_PASS = r'np'
 t_COMPARE = r'eq|neq'
 t_BIND = r'@|%'
 t_ARRAY = r'\:'
+t_ROBOT = r'mf|mb|ml|mr|tp|cur_x|cur_y'
 # Ignored characters
 t_ignore = " \t"
 

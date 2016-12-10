@@ -169,6 +169,7 @@ def p_exp(p):
            | literal
            | '(' exp ')'
            | bind
+           | robot
            '''
     l = len(p)
     if l == 2:
@@ -195,6 +196,11 @@ def p_empty(p):
     '''empty : LE
              | empty LE'''
     p[0] = Empty()
+
+
+def p_robot(p):
+    '''robot : ROBOT'''
+    p[0] = RobotNode(p[1])
 
 
 def p_error(p):

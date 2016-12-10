@@ -8,6 +8,7 @@ global_blocks = {}
 global_var = {}
 idToType = {}
 errors_list = []
+robot = None
 
 
 class DataNode:
@@ -383,6 +384,29 @@ class Literal(ValueItem):
                 return False
         if self.value_type == type_func:
             return None
+
+
+class RobotNode(TypedItem):
+    def __init__(self, text):
+        super().__init__(type_bool)
+        if text == 'cur_x' or text == 'cur_y':
+            self.value_type = type_int
+        self.command = text
+
+    def exec(self):
+        if robot:
+            if self.command == 'mf':
+                return robot.move_forward()
+            if self.command == 'mb':
+                return robot.move_back()
+            if self.command == 'mr':
+                return robot.move_right()
+            if self.command == 'ml':
+                return robot.move_left()
+            if self.command == 'cur_x':
+                return robot.x
+            if self.command == 'cur_y':
+                return robot.y
 
 
 class Empty(Node):
