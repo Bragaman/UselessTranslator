@@ -1,5 +1,5 @@
 import sys
-
+import random
 
 class Robot:
     def __init__(self, x,y, count_tp, map):
@@ -7,6 +7,7 @@ class Robot:
         self.x = x
         self.y = y
         self.count_tp = count_tp
+        self.known_lab = [(x, y)]
 
     def move(self, move_x, move_y):
         new_x = self.x + move_x
@@ -16,6 +17,7 @@ class Robot:
             if self.map[new_y][new_x]:
                 self.x = new_x
                 self.y = new_y
+                self.known_lab.append((self.x, self.y))
                 return True
             else:
                 return False
@@ -23,16 +25,39 @@ class Robot:
             return False
 
     def move_left(self):
-        return self.move(-1, 0)
+        res = self.move(-1, 0)
+        return res
 
     def move_right(self):
-        return self.move(1, 0)
+        res = self.move(1, 0)
+        return res
 
     def move_forward(self):
-        return self.move(0, 1)
+        res = self.move(0, 1)
+        return res
 
     def move_back(self):
-        return self.move(0, -1)
+        res = self.move(0, -1)
+        return res
+
+    def teleport(self):
+        if self.count_tp is not 0:
+            self.count_tp -= 1
+            cells = []
+            for i in range(len(self.map)):
+                for j in range(len(self.map)):
+                    if self.map[i][j]:
+                        cells.append((j,i))
+            tmp = set(cells) - set(self.known_lab)
+
+            if len(tmp) > 0:
+                new_poz = random.sample(tmp, 1)[0]
+                self.x = new_poz[0]
+                self.y = new_poz[1]
+                self.known_lab.append((self.x, self.y))
+                return True
+
+        return False
 
 
 def load_map(path):
@@ -80,4 +105,7 @@ if __name__ == '__main__':
             if robot.move_right():
                 dfs()
                 robot.move_left()
+
     dfs()
+    while robot.teleport():
+        dfs()

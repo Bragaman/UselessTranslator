@@ -407,6 +407,8 @@ class RobotNode(TypedItem):
                 return robot.x
             if self.command == 'cur_y':
                 return robot.y
+            if self.command == 'tp':
+                return robot.teleport()
 
 
 class Empty(Node):

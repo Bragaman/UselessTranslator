@@ -21,6 +21,11 @@ if __name__ == "__main__":
     ,7 <- ,5:1-2
     ,8 <- ,5:1-3
     .3 <- mr
+    .3 <- tp
+    .3 <- tp
+    .3 <- tp
+    .3 <- tp
+
     ,1 <- cur_x
     '''
 
@@ -28,7 +33,7 @@ if __name__ == "__main__":
     print(cur)
     print(lab)
     if cur:
-        ast.robot = Robot(cur[0], cur[1], 0, lab)
+        ast.robot = Robot(cur[0], cur[1], 2, lab)
     else:
         ast.robot = Robot(0, 0, 0, lab)
 
