@@ -25,18 +25,22 @@ class Robot:
             return False
 
     def move_left(self):
+        print('left', self.x, self.y)
         res = self.move(-1, 0)
         return res
 
     def move_right(self):
+        print('right', self.x, self.y)
         res = self.move(1, 0)
         return res
 
     def move_forward(self):
+        print('forward', self.x, self.y)
         res = self.move(0, 1)
         return res
 
     def move_back(self):
+        print('back', self.x, self.y)
         res = self.move(0, -1)
         return res
 
@@ -56,7 +60,6 @@ class Robot:
                 self.y = new_poz[1]
                 self.known_lab.append((self.x, self.y))
                 return True
-
         return False
 
 

@@ -165,11 +165,11 @@ class Statements(Node):
         return label + 1
 
     def exec(self):
-        print('--Exec before labels--')
+        # print('--Exec before labels--')
         i = self.exec_statements(self.stmts, -1)
         while i < len(self.labels):
             label_id = self.labels[i]
-            print('--Exec label--', label_id)
+            # print('--Exec label--', label_id)
             stmts = self.blocks[label_id]
             i = self.exec_statements(stmts, i)
 
@@ -188,10 +188,10 @@ class While(Node):
         self.stmts = stmts
 
     def exec(self):
-        print('----Start exec while-----')
+        # print('----Start exec while-----')
         while self.condition.exec():
             self.stmts.exec()
-        print('----Finish exec while-----')
+        # print('----Finish exec while-----')
 
 
 class Function(Node):
@@ -202,7 +202,7 @@ class Function(Node):
         print('----Start exec func-----')
         if self.stmts:
             self.stmts.exec()
-        print('----Finish exec while-----')
+        # print('----Finish exec while-----')
 
 
 class Label(Node):
@@ -318,10 +318,10 @@ class Operators(TypedItem):
     def exec(self):
         self.var.init_from_global()
         if self.operator == '--':
-            print('---exec op decrement---')
+            # print('---exec op decrement---')
             self.var.value -= 1
         if self.operator == '++':
-            print('---exec op increment---')
+            # print('---exec op increment---')
             self.var.value += 1
         self.var.sync_with_global()
         return self.var.exec()
@@ -355,6 +355,7 @@ class Condition(TypedItem):
     operators = {
         'eq': lambda r, l: r == l,
         'neq': lambda r, l: r != l,
+        'less': lambda r, l: r > l,
     }
 
     def __init__(self, varL, varR, operator):
